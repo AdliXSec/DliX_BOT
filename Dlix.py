@@ -7,7 +7,7 @@ import requests
 import random
 import hashlib
 
-api = "5528549523:AAHqzEl53rhrUQIGLFsQMWF42Joeyu09AtE"
+api = "Token API"
 bot = TeleBot(api)
 
 sapa = ['Hai Juga', 'Hallo Juga', 'Hi Juga', 'Aloo Juga']
