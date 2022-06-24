@@ -7,11 +7,15 @@ import requests
 import random
 import hashlib
 
-api = "Token API"
+api = "5528549523:AAHqzEl53rhrUQIGLFsQMWF42Joeyu09AtE"
 bot = TeleBot(api)
 
 sapa = ['Hai Juga', 'Hallo Juga', 'Hi Juga', 'Aloo Juga']
 nama = ['Nama Saya adalah DliX Bot\nYang di ciptakan oleh Tuan Adli ']
+
+
+# Bagian Menu
+
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
@@ -19,11 +23,13 @@ def start_message(message):
     last_name = message.from_user.last_name
     bot.reply_to(message, 'Hi, apa kabar {} {}? Ada yang bisa saya bantu?'.format(first_name,last_name))
     markup = types.ReplyKeyboardMarkup()
-    item1 = types.KeyboardButton('/bantuan')
-    item2 = types.KeyboardButton('/start')
-    markup.row(item1, item2)
+    item3 = types.KeyboardButton('/menu')
+    item4 = types.KeyboardButton('/bantuan')
+    item5 = types.KeyboardButton('/cek_id')
+    markup.row(item3, item4)
+    markup.row(item5)
     chatid = message.chat.id
-    bot.reply_to(chatid, 'Silahkan pilih', reply_markup=markup)
+    bot.send_message(chatid, 'Silahkan pilih', reply_markup=markup)
     
 @bot.message_handler(commands=['bantuan'])
 def bantuan(message):
@@ -50,15 +56,36 @@ Username = {}
 ID = {}
 '''.format(first_name,last_name, username, id_telegram))    
     
-# @bot.message_handler(content_types=['text'])
-# def chatbot(message):
-#     text = message.text
-#     if re.findall('halo|hai|aloo|hi|Halo|Hai|Aloo', text):
-#         chatid = message.chat.id
-#         bot.send_message(chatid, random.choice(sapa))
-#     elif re.findall('siapa|kamu|anda|Siapa|Kamu|Anda', text):
-#         chatid = message.chat.id
-#         bot.send_message(chatid, random.choice(nama))
+@bot.message_handler(commands=['menu'])
+def menu(message):
+    bot.reply_to(message, ''' -= TOOLS MENU =-
+
+
+Check ID:
+ex = /cek_id
+
+Domain To IP:
+ex = /domain_to_ip website.com
+
+MD5:
+ex = /md5 string
+
+SHA1:
+ex = /sha1 string
+
+IP Geolocation:
+ex = /ip_geo 8.8.8.8 (your ip)
+
+Password Hash:
+ex = /pw_hash yourpw
+
+Random Quotes:
+ex = /random_quotes''')
+
+
+# BAGIAN TOOLS
+
+
     
 @bot.message_handler(commands=['domain_to_ip'])
 def domain_to_ip(message):
@@ -129,6 +156,13 @@ Password hash sha256 :  {sha256.hexdigest()}
 Password hash sha384 :  {sha384.hexdigest()}
 
 Password hash sha512 :  {sha512.hexdigest()}''')
+        
+@bot.message_handler(commands=['random_quotes'])
+def random_quotes(message):
+    file = open('c:/Users/NAUFAL SYAHRURADLI/Documents/python/repo Project/repo DliXBot/q.json','r').read()
+    sl = json.loads(file)
+    js = random.choice(sl)
+    bot.reply_to(message, f'{js["quote"]} \n\nby {js["nama"]}')
         
 while True:
     try:
