@@ -159,7 +159,7 @@ Password hash sha512 :  {sha512.hexdigest()}''')
         
 @bot.message_handler(commands=['random_quotes'])
 def random_quotes(message):
-    file = open('c:/Users/NAUFAL SYAHRURADLI/Documents/python/repo Project/repo DliXBot/q.json','r').read()
+    file = open('q.json','r').read()
     sl = json.loads(file)
     js = random.choice(sl)
     bot.reply_to(message, f'{js["quote"]} \n\nby {js["nama"]}')
