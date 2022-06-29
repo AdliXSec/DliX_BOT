@@ -22,8 +22,8 @@ from bs4 import BeautifulSoup as bes
 # And self._dislikes = self._ydl_info.get('dislike_count',0)
         
 
-id = 861422650
-username_owner = "itsmeAdli"
+id = "your id tele"
+username_owner = "your username tele"
 
 api = "Token API"
 bot = TeleBot(api)
