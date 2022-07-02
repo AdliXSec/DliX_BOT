@@ -9,11 +9,13 @@ import re
 import requests
 import random
 import hashlib
+import shutil
 from bs4 import BeautifulSoup as bes
 
 # pip install pytelegrambotapi
 # pip install youtube_dl
 # pip install requests
+# pip install instaloader
 # pip install beautifulsoup4
 
 # Note : edit file backend_youtube_dl.py in 
@@ -21,9 +23,13 @@ from bs4 import BeautifulSoup as bes
 # change to self._likes = self._ydl_info.get('like_count',0) 
 # And self._dislikes = self._ydl_info.get('dislike_count',0)
         
+# Acc Instagram
+ig_log = "username_ig"
+ig_pw  = "password_ig"
 
-id = "your id tele"
-username_owner = "your username tele"
+# Acc Telegram
+id = 12345678
+username_owner = "username_tele"
 
 api = "Token API"
 bot = TeleBot(api)
@@ -72,11 +78,6 @@ def menu(message):
     bot.reply_to(message, ''' -= TOOLS MENU =-
 
 
-Note: Bila anda memasukkan kalimat yg terdapat tanda " "(spasi) maka, Ubahlah tanda " " (spasi), menjadi tanda "_" (garis bawah/underscore).
-
-contoh: hai saya BOT. di ubah menjadi: hai_saya_BOT
-
-
 Check ID:
 /cek_id — Digunakan untuk mengecek ID Telegram anda, cara penggunaan nya.
 ex = /cek_id 
@@ -84,15 +85,19 @@ ex = /cek_id
 Tanya Wiki:
 /apa_itu — Digunakan untuk mencaritahu sesuatu, dan mendapatkan jawaban dari wikipeadia, contoh.
 ex = /apa_itu cahaya
-ex2 = /apa_itu Google_LLC (gunakan tanda _ untuk pengganti tanda spasi)
+ex2 = /apa_itu Google LLC
+
+YT Vidmate Download:
+/yt_vidmate — Digunakan untuk download musik youtube, berupa link download, cara penggunaan.
+ex = /yt_vidmate https://youtube/gcJVgFQwnpc
 
 YT Audio Download:
-/yt_audio — Digunakan untuk download musik youtube, cara penggunaan.
+/yt_audio — Digunakan untuk download musik youtube, dapat mendownload secara otomatis, dan di kirim otomatis ke telegram, cara penggunaan.
 ex = /yt_audio https://youtube/gcJVgFQwnpc
 
-YT Audio Download v2:
-/yt_audio2 — ini adalah versi ke2 yt downloader, dapat mendownload secara otomatis, cara penggunaan.
-ex = /yt_audio2 https://youtube/gcJVgFQwnpc
+Instagram Download:
+/ig_download — Digunakan untuk download postingan instagram, caranya.
+ex = /ig_download https://www.instagram.com/p/CfVZMhxrLmA/?utm_source=ig_web_copy_link
 
 Domain To IP:
 /domain_to_ip — Digunakan mengubah dari domain ke IP, cara penggunaan nya.
@@ -130,9 +135,7 @@ ex = /cj_tester https://example.com''')
 @bot.message_handler(commands=['domain_to_ip'])
 def domain_to_ip(message):
     
-    texts = message.text.split()
-    filter = texts[1]
-    text = filter.replace("_", " ")
+    text = message.text.replace("/domain_to_ip ", "")
     
     if text:
         bot.reply_to(message, "Cek Domain {}".format(text))
@@ -141,9 +144,7 @@ def domain_to_ip(message):
 @bot.message_handler(commands=['md5'])
 def hashmd5(message):
     
-    texts = message.text.split()
-    filter = texts[1]
-    text = filter.replace("_", " ")
+    text = message.text.replace("/md5 ", "")
     md5 = hashlib.md5()
     md5.update(text.encode("utf-8"))
     bot.reply_to(message, '''nilai asli : {} 
@@ -152,9 +153,7 @@ nilai hash md5 : {}'''.format(text, md5.hexdigest()))
 @bot.message_handler(commands=['sha1'])
 def hashsha(message):
     
-    texts = message.text.split()
-    filter = texts[1]
-    text = filter.replace("_", " ")
+    text = message.text.replace("/sha1 ", "")
     sha = hashlib.sha1()
     sha.update(text.encode("utf-8"))
     bot.reply_to(message, '''nilai asli : {} 
@@ -163,9 +162,7 @@ nilai hash sha1 : {}'''.format(text, sha.hexdigest()))
 @bot.message_handler(commands=['ip_geo'])
 def ipgeo(message):
     
-    texts = message.text.split()
-    filter = texts[1]
-    ipaddr = filter.replace("_", " ")
+    ipaddr = message.text.replace("/ip_geo ", "")
     ipreq = requests.get(f"http://ip-api.com/json/{ipaddr}")
 
     if ipreq.status_code == 200:
@@ -184,8 +181,7 @@ def ipgeo(message):
 @bot.message_handler(commands=['pw_hash'])
 def pw_hash(message):
     
-    texts = message.text.split()
-    text = texts[1]
+    text = message.text.replace("/pw_hash ", "")
     sha1 = hashlib.sha1()
     md5 = hashlib.md5()
     sha256 = hashlib.sha256()
@@ -246,8 +242,7 @@ def ClickjackingTester(message):
         """
         return code
 
-    texts = message.text.split()
-    site = texts[1]
+    site = message.text.replace("/cj_tester ", "")
 
         
     bot.reply_to(message, f"[*] Checking {site}")
@@ -263,9 +258,7 @@ def ClickjackingTester(message):
 @bot.message_handler(commands=['apa_itu'])
 def wiki(message):
     
-    texts = message.text.split()
-    filter = texts[1]
-    text = filter.replace("_", " ")
+    text = message.text.replace("/apa_itu ", "")
     if text:
         try:
             dpt = f'https://id.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles={text}'
@@ -280,11 +273,10 @@ Jawaban : {result}''')
             print(e)
             bot.reply_to(message, f'Maaf, Yang anda cari "{text}" tidak bisa ditemukan di wikipedia!')
             
-@bot.message_handler(commands=['yt_audio'])
+@bot.message_handler(commands=['yt_vidmate'])
 def ytAudio(message):
     
-    texts = message.text.split()
-    text = texts[1]
+    text = message.text.replace("/yt_vidmate ", "")
     if text:
         try:
             url = text.replace('[','').replace(']','')
@@ -301,26 +293,50 @@ Download link : {link_download}''')
             print(e)
             bot.reply_to(message, "Maaf sepertinya link ini telah error")
 
-@bot.message_handler(commands=['yt_audio2'])
+@bot.message_handler(commands=['yt_audio'])
 def ytAudio(message):
-    texts = message.text.split()
-    filter = texts[1]
-    url = pafy.new(filter)
-    bot.reply_to(message, f'''Note : versi k2 dalam proses pengembangan, maaf jika ada error
+    try:
+        filter = message.text.replace("/yt_audio ", "")
+        url = pafy.new(filter)
+        bot.reply_to(message, f'''Note : versi k2 dalam proses pengembangan, maaf jika ada error
 
 Judul : {url.title}
 Thumbnail : {url.thumb}
 Durasi : {url.duration}
 
-Sedang Mendownload Mohon Tunggu Sesaat''')
-    result = url.getbestaudio()
-    result.download(f'{url.title}.mp3')
-    
-    for i in os.listdir():
-        if i.endswith(".mp3"):
+Sedang Mendownload Mohon Tunggu Sesaat
+estimasi download [3 menit jika sinyal lancar]
+
+''')
+        result = url.getbestaudio()
+        result.download(f'{url.title} {message.from_user.id}.mp3')
+        
+        for i in os.listdir():
+            if i.endswith(f"{message.from_user.id}.mp3"):
+                print(i)
+                bot.send_audio(message.chat.id, open(i, 'rb'))
+                os.remove(i)
+    except:
+        bot.reply_to(message, "Maaf, Ada Kesalahan Silahkan Masukkan Kembali Link Dengan Benar")
+        
+@bot.message_handler(commands=['ig_download'])
+def ig_download(message):
+    try:
+        isi = message.text.replace("/ig_download ", "").replace("https://www.instagram.com/reel/", "").replace("/?utm_source=ig_web_copy_link", "").replace("https://www.instagram.com/p/","").replace("/?igshid=YmMyMTA2M2Y=", "")
+        bot.reply_to(message, "Download Sedang di proses Silahkan menunggu, Download mungkin agak lama.....")
+        os.system(f"instaloader --login={ig_log} --password={ig_pw} -- -{isi}")
+        
+        for i in os.listdir(f'-{isi}'):
             print(i)
-            bot.send_audio(message.chat.id, open(i, 'rb'))
-            os.remove(i)
+            if i.endswith(".jpg"):
+                print("anjay")
+                bot.send_photo(message.chat.id, open(f'-{isi}/{i}', 'rb'))
+            elif i.endswith(".mp4"):
+                print("anjass")
+                bot.send_video(message.chat.id, open(f'-{isi}/{i}', 'rb'))
+        shutil.rmtree(f"-{isi}")
+    except:
+        bot.reply_to(message, '''Maaf, Ada Kesalahan Silahkan Masukkan Kembali Link Dengan Benar''')
             
 # @bot.message_handler(commands=['story_horror'])
 # def story(message):
